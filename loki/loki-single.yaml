@@ -59,6 +59,14 @@ loki:
     query_range:
       parallelise_shardable_queries: false
       align_queries_with_step: true
+      cache_results: true
+      results_cache:
+        cache:
+          default_validity: 12h
+          memcached_client:
+            host: results-cache-memcached.loki.svc.cluster.local
+            service: memcache
+            timeout: 500ms
     
     querier:
       query_timeout: 300s
@@ -99,10 +107,28 @@ loki:
       boltdb_shipper:
         active_index_directory: /var/loki/index
         shared_store: s3
+      index_queries_cache_config:
+        memcached:
+            batch_size: 256
+            parallelism: 10
+        memcached_client:
+            host: index-cache-memcached.loki.svc.cluster.local
+            service: memcache
       hedging:
         at: 250ms
         max_per_second: 20
         up_to: 3
+    
+    chunk_store_config:
+      chunk_cache_config:
+        memcached:
+          batch_size: 256
+          parallelism: 10
+        memcached_client:
+          host: chunk-cache-memcached.loki.svc.cluster.local
+          service: memcache
+    
+
 
 
 # Configuration for the write pod(s)
